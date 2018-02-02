@@ -21,3 +21,9 @@ end
 class SQLObject
   extend Searchable
 end
+
+# make where lazy and stackable
+# modify to create relation object with given params
+
+
+# leave parsing to #where

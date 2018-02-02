@@ -61,6 +61,9 @@ module Associatable
     # name is the association name
     options = BelongsToOptions.new(name, options)
 
+    # store these options by target class name
+    assoc_options[name] = options
+
     define_method(name) do
       # can't fk foreign key because then we're using setting method?
       fk = options.foreign_key.to_sym
@@ -69,7 +72,6 @@ module Associatable
       target_class = options.model_class
       target_class.where({ id: foreign_val }).first
     end
-
   end
 
   def has_many(name, options = {})
@@ -87,8 +89,10 @@ module Associatable
 
   def assoc_options
     # Wait to implement this in Phase IVa. Modify `belongs_to`, too.
+    @assoc_options ||= {}
   end
 end
+
 
 class SQLObject
   extend Associatable
