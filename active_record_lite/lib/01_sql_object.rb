@@ -84,19 +84,49 @@ class SQLObject
     @attributes ||= {}
   end
 
+# I wrote a SQLObject#attribute_values method that returns an array
+# of the values for each attribute. I did this by calling Array#map on
+# SQLObject::columns, calling send on the instance to get the value.
+
   def attribute_values
-    # ...
+    self.class.columns.map do |attribute|
+      send(attribute.to_sym)
+    end
+
+    # can't i just do this ? @attributes.values
   end
 
   def insert
-    # ...
+    # setting id to nil in SQL, is that fine?
+    col_names = self.class.columns.join(",")
+    question_marks = ["?"] * self.class.columns.length
+    q_mark_str = question_marks.join(",")
+
+    DBConnection.execute(<<-SQL, *attribute_values)
+      INSERT INTO
+        #{self.class.table_name} (#{col_names})
+      VALUES
+        (#{q_mark_str})
+    SQL
+
+    @attributes[:id] = DBConnection.last_insert_row_id
   end
 
   def update
-    # ...
+    # drop 1 to get rid of id
+    set = self.class.columns.drop(1).map { |colname| "#{colname} = ?"  }
+
+    DBConnection.execute(<<-SQL, *attribute_values[1..-1], self.id)
+      UPDATE
+        #{self.class.table_name}
+      SET
+        #{set.join(",")}
+      WHERE
+        ?
+    SQL
   end
 
   def save
-    # ...
+    self.class.find(self.id) ? update : insert
   end
 end

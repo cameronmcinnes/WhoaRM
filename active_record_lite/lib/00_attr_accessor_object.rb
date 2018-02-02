@@ -11,10 +11,9 @@ class AttrAccessorObject
       end
 
       setter = "#{ivar_name}="
-      ivar_name_w_at = "@#{ivar_name}"
 
       define_method(setter.to_sym) do |val|
-        self.instance_variable_set(ivar_name_w_at, val)
+        self.instance_variable_set(getter, val)
       end
     end
   end
