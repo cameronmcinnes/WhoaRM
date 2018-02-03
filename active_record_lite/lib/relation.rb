@@ -1,37 +1,74 @@
-class Relation < Array
+require_relative "01_sql_object"
 
-# use this in order to test whether or not a method called on relation
-# is an array method, if it is, execute the query
-  
-  def self.my_methods
-    Array.instance_methods - self.instance_methods
-  end
+# is there a solution where relation inherits from array class?
+# would need to override all array instance methods
 
-  def initialize(params)
+class Relation
+  attr_reader :params
+
+  def initialize(class_name, params)
+    @class_name = class_name
     @params = params
   end
 
-  # how do i cause any attempt to use the relation object
-  # to execute the query dictated by the params
-
-  # anytime you interact w a relation object you have to alter
-  # some aspect of the class
-
-  def inspect
-    execute_query
-
-    parse # => return object
-  end
-
-  def exectute_query
-
-
-  end
-
-
   # makes stackable
-  def add_params
-
+  def where(new_params)
+    add_params(new_params)
+    self
   end
 
+  # query will only execute if a valid array method is called
+  # on the relation object.
+  def method_missing(method_name, *args, &blk)
+    if Array.instance_methods.include?(method_name)
+      # call the actual array method on the parsed result arr
+      execute_query.send(method_name, *args, &blk)
+    else
+      super
+    end
+  end
+
+
+
+  private
+
+  def execute_query
+    # allows method to take raw SQL string or options hash
+    if params.is_a?(Hash)
+      results = hash_query
+    elsif params.is_a?(String)
+      results = str_query
+    end
+
+    @class_name.parse_all(results)
+  end
+
+  def str_query
+    results = DBConnection.execute(<<-SQL)
+      SELECT
+        *
+      FROM
+        #{@class_name.table_name}
+      WHERE
+        #{params}
+    SQL
+  end
+
+  def hash_query
+    where_line = params.keys.map { |key| "#{key} = ?" }.join(" AND ")
+
+    results = DBConnection.execute(<<-SQL, *params.values)
+      SELECT
+        *
+      FROM
+        #{@class_name.table_name}
+      WHERE
+        #{where_line}
+    SQL
+  end
+
+  # todo: add conditional that allows chaining of raw SQL str methods
+  def add_params(new_params)
+    @params = @params.merge(new_params)
+  end
 end

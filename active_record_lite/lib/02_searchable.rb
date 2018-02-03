@@ -1,20 +1,14 @@
 require_relative 'db_connection'
 require_relative '01_sql_object'
+require_relative 'relation'
 
 module Searchable
+
+  # made lazy and stackable by implementing relation class
+  # relation instances hold given parameters
+
   def where(params)
-    where_line = params.keys.map { |key| "#{key} = ?" }.join(" AND ")
-
-    results = DBConnection.execute(<<-SQL, *params.values)
-      SELECT
-        *
-      FROM
-        #{table_name}
-      WHERE
-        #{where_line}
-    SQL
-
-    parse_all(results)
+    Relation.new(self, params)
   end
 end
 
@@ -22,12 +16,18 @@ class SQLObject
   extend Searchable
 end
 
-# make where lazy and stackable
+# old code that passes all where specs (two specs fail with new
+# implementation because they expect an empty array and get a relation)
 
-# modify to create relation object with given params
-
-# add conditional so if #where is called with a relation object as
-# the receiver we add to that relaion object instead of creating a new one
-# stackable
-
-# leave parsing to #where
+#where_line = params.keys.map { |key| "#{key} = ?" }.join(" AND ")
+#
+# results = DBConnection.execute(<<-SQL, *params.values)
+#   SELECT
+#     *
+#   FROM
+#     #{table_name}
+#   WHERE
+#     #{where_line}
+# SQL
+#
+# parse_all(results)
