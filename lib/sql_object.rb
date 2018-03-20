@@ -80,6 +80,18 @@ class SQLObject
     self.parse_all(results).first
   end
 
+
+  def self.pluck(attr_name)
+    resultArr = DBConnection.execute(<<-SQL)
+      SELECT
+        #{table_name}.#{attr_name}
+      FROM
+        #{table_name}
+    SQL
+
+    resultArr.reduce([]) { |result, hash| result.concat(hash.values) }
+  end
+
   def initialize(params = {})
     @errors = Hash.new { |h, k| h[k] = [] }
 

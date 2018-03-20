@@ -31,7 +31,8 @@ VALUES
   (1, "Cameron", "McInnes", 1),
   (2, "Doc", "Sportello", 1),
   (3, "Burke", "Stodger", 2),
-  (4, "Japonica", "Fenway", NULL);
+  (4, "Japonica", "Fenway", NULL),
+  (5, "Cameron", "Jones", 1);
 
 INSERT INTO
   obstacles (id, name, contenstant_id)
