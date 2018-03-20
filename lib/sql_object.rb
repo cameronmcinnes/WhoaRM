@@ -139,7 +139,7 @@ class SQLObject
       SET
         #{set.join(",")}
       WHERE
-        ?
+        #{self.class.table_name}.id = ?
     SQL
   end
 
