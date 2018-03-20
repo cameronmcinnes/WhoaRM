@@ -81,7 +81,7 @@ class SQLObject
   end
 
   def initialize(params = {})
-    @errors = {}
+    @errors = Hash.new { |h, k| h[k] = [] }
 
     params.each do |attr_name, value|
       attr_sym = attr_name.to_sym
