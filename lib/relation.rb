@@ -1,4 +1,4 @@
-require_relative "01_sql_object"
+require_relative "sql_object"
 
 # is there a solution where relation inherits from array class?
 # would need to override all array instance methods

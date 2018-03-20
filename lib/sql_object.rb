@@ -1,7 +1,5 @@
 require_relative 'db_connection'
 require 'active_support/inflector'
-# NB: the attr_accessor we wrote in phase 0 is NOT used in the rest
-# of this project. It was only a warm up.
 
 class SQLObject
   def self.columns
@@ -20,7 +18,8 @@ class SQLObject
   def self.finalize!
     columns.each do |column_name|
       define_method(column_name) do
-        self.attributes[column_name] # self is instance  of class (because we're inside define method)
+        # self is instance  of class (because we're inside define method)
+        self.attributes[column_name]
       end
 
       setter = "#{column_name}="
