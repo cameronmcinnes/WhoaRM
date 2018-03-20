@@ -3,19 +3,27 @@ require_relative 'validator'
 
 require 'byebug'
 
-# call validates in initialize of SQLObject
-
 module Validatable
-  attr_reader :errors
-
-  def self.validates(attr_name, options)
-    # save the new validator object as a CLASS INSTANCE variable
-    # then from the sql object initialize call the validate method
-    # in the validator class
-    self.validator = Validator.new(self, attr_name, options)
+  def self.included(base)
+    base.extend(ClassMethods)
   end
+
+  attr_reader :errors
 
   def valid?
     self.class.validator.validate(self)
   end
+
+  # private
+  module ClassMethods
+    def validates(*attr_names, options)
+      # save the new validator object as class instance variable
+      # self.validator = Validator.new(self, attr_name, options)
+
+      self.validator ||= Validator.new(self)
+      self.validator.add_validations(*attr_names, options)
+    end
+  end
+
+  attr_writer :errors
 end
