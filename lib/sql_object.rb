@@ -154,8 +154,8 @@ class SQLObject
     if self.valid?
       id.nil? ? update : insert
     else
-      msg = 'validations failed, see #errors'
-      raise RecordNotSaved.new(self.errors), 'validations failed'
+      msg = "validations failed: \n #{self.errors}"
+      raise RecordNotSaved.new(self.errors), msg
     end
   end
 end
