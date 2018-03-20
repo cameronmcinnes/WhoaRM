@@ -1,11 +1,18 @@
 require_relative 'db_connection'
 require_relative 'associatable'
 require_relative 'searchable'
+require_relative 'validatable'
 require 'active_support/inflector'
 
 class SQLObject
   extend Associatable
   extend Searchable
+  include Validatable
+
+  # enables attr_accessors of the class instance variable validator
+  class << self
+    attr_accessor :validator
+  end
 
   def self.columns
     return @columns if @columns
@@ -74,6 +81,8 @@ class SQLObject
   end
 
   def initialize(params = {})
+    @errors = {}
+
     params.each do |attr_name, value|
       attr_sym = attr_name.to_sym
       unless self.class.columns.include?(attr_sym)
@@ -82,6 +91,10 @@ class SQLObject
 
       self.send("#{attr_sym}=", value)
     end
+
+    # call validate on insertion not initialize
+    # validator = self.class.validator
+    # validator.validate(self) if validator
   end
 
   def attributes

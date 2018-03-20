@@ -4,10 +4,10 @@ require_relative "sql_object"
 # would need to override all array instance methods
 
 class Relation
-  attr_reader :params
+  attr_reader :params, :sql_object_class
 
-  def initialize(class_name, params)
-    @class_name = class_name
+  def initialize(sql_object_class, params)
+    @sql_object_class = sql_object_class
     @params = params
   end
 
@@ -34,7 +34,7 @@ class Relation
     # allows method to take raw SQL string or options hash
     results = params.is_a?(Hash) ? hash_query : str_query
 
-    @class_name.parse_all(results)
+    sql_object_class.parse_all(results)
   end
 
   def str_query
@@ -42,7 +42,7 @@ class Relation
       SELECT
         *
       FROM
-        #{@class_name.table_name}
+        #{sql_object_class.table_name}
       WHERE
         #{params}
     SQL
@@ -55,7 +55,7 @@ class Relation
       SELECT
         *
       FROM
-        #{@class_name.table_name}
+        #{sql_object_class.table_name}
       WHERE
         #{where_line}
     SQL
@@ -63,10 +63,10 @@ class Relation
 
   # todo: enable chaining of hash and string querys together
   def add_params(new_params)
-    if params.is_a?(Hash)
-      @params = @params.merge(new_params)
-    elsif params.is_a?(String)
-      @params += new_params
+    if new_params.is_a?(Hash)
+      params = params.merge(new_params)
+    elsif new_params.is_a?(String)
+      params += new_params
     end
   end
 end

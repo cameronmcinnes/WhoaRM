@@ -6,7 +6,7 @@ CREATE TABLE obstacles (
   FOREIGN KEY(contenstant_id) REFERENCES contenstant(id)
 );
 
-CREATE TABLE contenstants (
+CREATE TABLE contestants (
   id INTEGER PRIMARY KEY,
   fname VARCHAR(255) NOT NULL,
   lname VARCHAR(255) NOT NULL,
@@ -26,7 +26,7 @@ VALUES
   (1, "Silver snakes"), (2, "Blue barricudas");
 
 INSERT INTO
-  contenstants (id, fname, lname, team_id)
+  contestants (id, fname, lname, team_id)
 VALUES
   (1, "Cameron", "McInnes", 1),
   (2, "Doc", "Sportello", 1),
