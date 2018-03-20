@@ -14,6 +14,7 @@ class Team < SQLObject
   finalize!
 end
 
+# load 'lib/errors/not_saved.rb'
 # load 'lib/validatable.rb'
 # load 'lib/validator.rb'
 # load 'lib/searchable.rb'

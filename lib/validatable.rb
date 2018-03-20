@@ -11,7 +11,7 @@ module Validatable
   attr_accessor :errors
 
   def valid?
-    self.class.validator.validate(self)
+    self.class.validator ? self.class.validator.validate(self) : true
   end
 
 
@@ -20,7 +20,6 @@ module Validatable
   module ClassMethods
     def validates(*attr_names, options)
       # save the new validator object as class instance variable
-      # self.validator = Validator.new(self, attr_name, options)
 
       self.validator ||= Validator.new(self)
       self.validator.add_validations(*attr_names, options)

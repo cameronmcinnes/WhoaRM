@@ -2,6 +2,7 @@ require_relative 'db_connection'
 require_relative 'associatable'
 require_relative 'searchable'
 require_relative 'validatable'
+require_relative 'errors/not_saved'
 require 'active_support/inflector'
 
 class SQLObject
@@ -30,7 +31,7 @@ class SQLObject
   def self.finalize!
     columns.each do |column_name|
       define_method(column_name) do
-        # self is instance  of class (because we're inside define method)
+        # self is instance  of class (inside define method)
         self.attributes[column_name]
       end
 
@@ -103,31 +104,18 @@ class SQLObject
 
       self.send("#{attr_sym}=", value)
     end
-
-    # call validate on insertion not initialize
-    # validator = self.class.validator
-    # validator.validate(self) if validator
   end
 
   def attributes
     @attributes ||= {}
   end
 
-# I wrote a SQLObject#attribute_values method that returns an array
-# of the values for each attribute. I did this by calling Array#map on
-# SQLObject::columns, calling send on the instance to get the value.
-
   def attribute_values
-    self.class.columns.map do |attribute|
-      send(attribute.to_sym)
-    end
-
-    # can't i just do this ? @attributes.values
+    self.class.columns.map { |attr_name| send(attr_name) }
   end
 
   def insert
-    # setting id to nil in SQL, is that fine?
-    col_names = self.class.columns.join(",")
+    col_names = self.class.columns.drop(1).join(",")
     question_marks = ["?"] * self.class.columns.length
     q_mark_str = question_marks.join(",")
 
@@ -142,7 +130,6 @@ class SQLObject
   end
 
   def update
-    # drop 1 to get rid of id
     set = self.class.columns.drop(1).map { |colname| "#{colname} = ?"  }
 
     DBConnection.execute(<<-SQL, *attribute_values[1..-1], self.id)
@@ -156,6 +143,19 @@ class SQLObject
   end
 
   def save
-    self.class.find(self.id) ? update : insert
+    if self.valid?
+      id.nil? ? update : insert
+    else
+      false
+    end
+  end
+
+  def save!
+    if self.valid?
+      id.nil? ? update : insert
+    else
+      msg = 'validations failed, see #errors'
+      raise RecordNotSaved.new(self.errors), 'validations failed'
+    end
   end
 end
