@@ -28,17 +28,11 @@ class Relation
     end
   end
 
-
-
   private
 
   def execute_query
     # allows method to take raw SQL string or options hash
-    if params.is_a?(Hash)
-      results = hash_query
-    elsif params.is_a?(String)
-      results = str_query
-    end
+    results = params.is_a?(Hash) ? hash_query : str_query
 
     @class_name.parse_all(results)
   end
@@ -67,8 +61,12 @@ class Relation
     SQL
   end
 
-  # todo: add conditional that allows chaining of raw SQL str methods
+  # todo: enable chaining of hash and string querys together
   def add_params(new_params)
-    @params = @params.merge(new_params)
+    if params.is_a?(Hash)
+      @params = @params.merge(new_params)
+    elsif params.is_a?(String)
+      @params += new_params
+    end
   end
 end
