@@ -131,9 +131,9 @@ class SQLObject
   end
 
   def update
-    set = self.class.columns.map { |colname| "#{colname} = ?"  }
+    set = self.class.columns.drop(1).map { |colname| "#{colname} = ?"  }
 
-    DBConnection.execute(<<-SQL, *attribute_values, self.id)
+    DBConnection.execute(<<-SQL, *attribute_values.drop(1), self.id)
       UPDATE
         #{self.class.table_name}
       SET

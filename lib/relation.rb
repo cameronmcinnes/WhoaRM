@@ -10,7 +10,6 @@ class Relation
     @params = params
   end
 
-  # makes stackable
   def where(new_params)
     add_params(new_params)
     self
@@ -42,7 +41,7 @@ class Relation
   def execute_pluck_query(column_name)
     results = params.is_a?(Hash) ?
       hash_query(column_name) : str_query(column_name)
-    debugger
+
     results.reduce([]) { |result, hash| result.concat(hash.values) }
   end
 
