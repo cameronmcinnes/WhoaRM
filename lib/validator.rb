@@ -1,5 +1,3 @@
-require 'byebug'
-
 class Validator
   attr_accessor :sql_object_class, :attr_names, :options
 

@@ -1,7 +1,5 @@
 require_relative "sql_object"
 
-require 'byebug'
-
 class Relation
   attr_reader :params, :sql_object_class
 

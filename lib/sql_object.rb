@@ -4,7 +4,6 @@ require_relative 'searchable'
 require_relative 'validatable'
 require_relative 'errors/not_saved'
 require 'active_support/inflector'
-require 'byebug'
 
 class SQLObject
   extend Associatable

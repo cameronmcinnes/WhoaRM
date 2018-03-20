@@ -1,8 +1,6 @@
 require_relative 'sql_object'
 require_relative 'validator'
 
-require 'byebug'
-
 module Validatable
   def self.included(base)
     base.extend(ClassMethods)
@@ -19,8 +17,6 @@ module Validatable
 
   module ClassMethods
     def validates(*attr_names, options)
-      # save the new validator object as class instance variable
-
       self.validator ||= Validator.new(self)
       self.validator.add_validations(*attr_names, options)
     end
