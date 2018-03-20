@@ -26,6 +26,9 @@ class Validator
     end
   end
 
+
+  private
+
   def validate_attr(attr_name, new_instance)
     attr_value = new_instance.send(attr_name)
 
@@ -46,5 +49,9 @@ class Validator
 
   def uniqueness(bool, attr_value, attr_name)
     bool != sql_object_class.pluck(attr_name).include?(attr_value)
+  end
+
+  def numericality(bool, attr_value, _)
+    bool == !!Float(attr_value) rescue false
   end
 end

@@ -8,13 +8,15 @@ module Validatable
     base.extend(ClassMethods)
   end
 
-  attr_reader :errors
+  attr_accessor :errors
 
   def valid?
     self.class.validator.validate(self)
   end
 
-  # private
+
+  private
+
   module ClassMethods
     def validates(*attr_names, options)
       # save the new validator object as class instance variable
@@ -24,6 +26,4 @@ module Validatable
       self.validator.add_validations(*attr_names, options)
     end
   end
-
-  attr_writer :errors
 end
