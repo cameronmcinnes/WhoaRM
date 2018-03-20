@@ -4,6 +4,7 @@ require_relative 'searchable'
 require_relative 'validatable'
 require_relative 'errors/not_saved'
 require 'active_support/inflector'
+require 'byebug'
 
 class SQLObject
   extend Associatable
@@ -116,10 +117,10 @@ class SQLObject
 
   def insert
     col_names = self.class.columns.drop(1).join(",")
-    question_marks = ["?"] * self.class.columns.length
+    question_marks = ["?"] * (self.class.columns.length - 1)
     q_mark_str = question_marks.join(",")
 
-    DBConnection.execute(<<-SQL, *attribute_values)
+    DBConnection.execute(<<-SQL, *attribute_values.drop(1))
       INSERT INTO
         #{self.class.table_name} (#{col_names})
       VALUES
@@ -130,9 +131,9 @@ class SQLObject
   end
 
   def update
-    set = self.class.columns.drop(1).map { |colname| "#{colname} = ?"  }
+    set = self.class.columns.map { |colname| "#{colname} = ?"  }
 
-    DBConnection.execute(<<-SQL, *attribute_values[1..-1], self.id)
+    DBConnection.execute(<<-SQL, *attribute_values, self.id)
       UPDATE
         #{self.class.table_name}
       SET
@@ -143,16 +144,16 @@ class SQLObject
   end
 
   def save
-    if self.valid?
-      id.nil? ? update : insert
+    if valid?
+      id.nil? ? insert : update
     else
       false
     end
   end
 
   def save!
-    if self.valid?
-      id.nil? ? update : insert
+    if valid?
+      id.nil? ? insert : update
     else
       msg = "validations failed: \n #{self.errors}"
       raise RecordNotSaved.new(self.errors), msg

@@ -1,7 +1,6 @@
 require_relative "sql_object"
 
-# is there a solution where relation inherits from array class?
-# would need to override all array instance methods
+require 'byebug'
 
 class Relation
   attr_reader :params, :sql_object_class
@@ -15,6 +14,10 @@ class Relation
   def where(new_params)
     add_params(new_params)
     self
+  end
+
+  def pluck(column_name)
+    execute_pluck_query(column_name.to_s)
   end
 
   # query will only execute if a valid array method is called
@@ -31,16 +34,22 @@ class Relation
   private
 
   def execute_query
-    # allows method to take raw SQL string or options hash
     results = params.is_a?(Hash) ? hash_query : str_query
 
     sql_object_class.parse_all(results)
   end
 
-  def str_query
+  def execute_pluck_query(column_name)
+    results = params.is_a?(Hash) ?
+      hash_query(column_name) : str_query(column_name)
+    debugger
+    results.reduce([]) { |result, hash| result.concat(hash.values) }
+  end
+
+  def str_query(pluck_column = '*')
     results = DBConnection.execute(<<-SQL)
       SELECT
-        *
+        #{sql_object_class.table_name}.#{pluck_column}
       FROM
         #{sql_object_class.table_name}
       WHERE
@@ -48,12 +57,12 @@ class Relation
     SQL
   end
 
-  def hash_query
+  def hash_query(pluck_column = '*')
     where_line = params.keys.map { |key| "#{key} = ?" }.join(" AND ")
 
     results = DBConnection.execute(<<-SQL, *params.values)
       SELECT
-        *
+        #{sql_object_class.table_name}.#{pluck_column}
       FROM
         #{sql_object_class.table_name}
       WHERE
