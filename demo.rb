@@ -1,7 +1,7 @@
 require_relative 'lib/sql_object'
 
 class Contestant < SQLObject
-  validates :fname, presence: true
+  validates :fname, uniqueness: true
 
   belongs_to :team
   finalize!

@@ -28,6 +28,6 @@ class Validator
   end
 
   def uniqueness(bool, attr_value)
-    
+    bool != sql_object_class.pluck(attr_name).include?(attr_value)
   end
 end
