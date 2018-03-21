@@ -1,5 +1,11 @@
+require_relative 'lib/errors/not_saved.rb'
 require_relative 'lib/validatable.rb'
-require_relative 'lib/sql_object'
+require_relative 'lib/validator.rb'
+require_relative 'lib/searchable.rb'
+require_relative 'lib/associatable.rb'
+require_relative 'lib/sql_object.rb'
+require_relative 'lib/db_connection.rb'
+require_relative 'demo.rb'
 
 class Contestant < SQLObject
   validates :lname, uniqueness: true, presence: true
