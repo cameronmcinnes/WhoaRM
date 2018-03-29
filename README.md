@@ -4,6 +4,10 @@ GoRM connects classes to relational database tables to establish an almost zero-
 
 GoRM values convention over configuration and makes use of metaprogramming to intelligently generate method names. GoRM allows customization of names but is most powerful when used in conjunction with strong naming conventions.
 
+## Using this project
+
+To demo GoRM clone this repo locally, run bundle install, and open pry. From there you can query the database. Be sure to try out associations [three tables] including `#belongs_to`, `#has_many`, and `#has_one_through`. Try initializing new SQLObjects and testing whether or not they're valid with `#valid?` and `#errors`. Inside the `demo.rb` file you can change validations (try `numericality: true`). Also try out querying, including pluck and lazy where queries to see them return Relation objects until valid array methods are called upon them.
+
 ## Features
 In the following code is the Team class is automatically mapped to the existing database table of the same name, pluralized.
 

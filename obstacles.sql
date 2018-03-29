@@ -1,9 +1,9 @@
 CREATE TABLE obstacles (
   id INTEGER PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  contenstant_id INTEGER,
+  contestant_id INTEGER,
 
-  FOREIGN KEY(contenstant_id) REFERENCES contenstant(id)
+  FOREIGN KEY(contestant_id) REFERENCES contestant(id)
 );
 
 CREATE TABLE contestants (
@@ -35,7 +35,7 @@ VALUES
   (5, "Cameron", "Jones", 1);
 
 INSERT INTO
-  obstacles (id, name, contenstant_id)
+  obstacles (id, name, contestant_id)
 VALUES
   (1, "The moat", 1),
   (2, "The steps of Knowledge", 2),
